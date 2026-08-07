@@ -15,8 +15,8 @@ from datetime import date, datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CSV_16 = os.path.join(BASE, "risque_modele_16.csv")
-CSV_33 = os.path.join(BASE, "risque_modele_33.csv")
+CSV_16 = os.path.join(BASE, "data", "risque_modele_16.csv")
+CSV_33 = os.path.join(BASE, "data", "risque_modele_33.csv")
 JSON_OUT = os.path.join(BASE, "src", "app", "riskData.json")
 
 EXCEL_EPOCH = date(1899, 12, 30)
