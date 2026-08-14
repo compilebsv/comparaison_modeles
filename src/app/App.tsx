@@ -454,12 +454,11 @@ function StackedBarChart({
     if (!el || !data.length) return;
     const todayIdx = data.findIndex(d => d.isToday);
     if (todayIdx < 0) {
-      el.scrollLeft = el.scrollWidth - el.clientWidth;
+      el.scrollLeft = 0;
       return;
     }
     const todayPos = L + todayIdx * GROUP_W;
-    const target = todayPos + GROUP_W + 40 - el.clientWidth;
-    el.scrollLeft = Math.max(0, Math.min(target, el.scrollWidth - el.clientWidth));
+    el.scrollLeft = Math.max(0, Math.min(todayPos, el.scrollWidth - el.clientWidth));
   }, [data, L, GROUP_W]);
 
   return (
@@ -803,12 +802,11 @@ export default function App() {
     if (!el || visibleSerials.length === 0) return;
     const todayIdx = TODAY_INDEX - visibleRange.start;
     if (todayIdx < 0) {
-      el.scrollLeft = el.scrollWidth - el.clientWidth;
+      el.scrollLeft = 0;
       return;
     }
     const todayPos = STICKY_COL_W + todayIdx * TABLE_COL_W;
-    const target = todayPos + TABLE_COL_W + 40 - el.clientWidth;
-    el.scrollLeft = Math.max(0, Math.min(target, el.scrollWidth - el.clientWidth));
+    el.scrollLeft = Math.max(0, Math.min(todayPos, el.scrollWidth - el.clientWidth));
   }, [visibleSerials, visibleRange, TODAY_INDEX]);
 
   const toggleModel = (id: string) => {
