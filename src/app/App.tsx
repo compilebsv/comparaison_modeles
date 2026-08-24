@@ -14,6 +14,63 @@ const RISK = [
   { label: "Très fort", bg: "#fee2e2", text: "#b91c1c", border: "#fca5a5", dot: "#ef4444" },
 ];
 
+// ─── Rain (pluie) color scale ─────────────────────────────────────────────────
+// White → blue → violet (very strong). Reference points are placed at equal
+// distance along the gradient; values in between are interpolated.
+
+const PLUIE_STOPS: { v: number; c: string }[] = [
+  { v: 0,    c: "#ffffff" },
+  { v: 0.25, c: "#eff6ff" },
+  { v: 0.5,  c: "#dbeafe" },
+  { v: 1,    c: "#bfdbfe" },
+  { v: 1.5,  c: "#93c5fd" },
+  { v: 2,    c: "#60a5fa" },
+  { v: 3,    c: "#3b82f6" },
+  { v: 5,    c: "#2563eb" },
+  { v: 7,    c: "#1d4ed8" },
+  { v: 10,   c: "#4338ca" },
+  { v: 15,   c: "#5b21b6" },
+  { v: 20,   c: "#6d28d9" },
+  { v: 25,   c: "#7c3aed" },
+  { v: 30,   c: "#8b5cf6" },
+];
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+function pluieScale(v: number | undefined): { bg: string; text: string } {
+  if (v == null || !isFinite(v)) return { bg: "#f1f5f9", text: "#64748b" };
+  const first = PLUIE_STOPS[0];
+  const last = PLUIE_STOPS[PLUIE_STOPS.length - 1];
+  let rgb: [number, number, number];
+  if (v <= first.v) rgb = hexToRgb(first.c);
+  else if (v >= last.v) rgb = hexToRgb(last.c);
+  else {
+    let a = first;
+    let b = last;
+    for (let i = 0; i < PLUIE_STOPS.length - 1; i++) {
+      if (v >= PLUIE_STOPS[i].v && v <= PLUIE_STOPS[i + 1].v) {
+        a = PLUIE_STOPS[i];
+        b = PLUIE_STOPS[i + 1];
+        break;
+      }
+    }
+    const t = (v - a.v) / (b.v - a.v);
+    const [r1, g1, bl1] = hexToRgb(a.c);
+    const [r2, g2, bl2] = hexToRgb(b.c);
+    rgb = [
+      Math.round(r1 + (r2 - r1) * t),
+      Math.round(g1 + (g2 - g1) * t),
+      Math.round(bl1 + (bl2 - bl1) * t),
+    ];
+  }
+  const [r, g, b] = rgb;
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return { bg: `rgb(${r}, ${g}, ${b})`, text: lum > 0.62 ? "#1f2937" : "#ffffff" };
+}
+
 // ─── Models ───────────────────────────────────────────────────────────────────
 
 const MODELS = [
@@ -990,10 +1047,22 @@ export default function App() {
              </span>
              {r.label}
            </span>
-         ))}
+          ))}
+        </div>
+
+       {/* ── Rain legend ── */}
+       <div className="px-6 py-2.5 border-b border-border bg-background flex items-center gap-3 flex-wrap" style={{ fontFamily: "'Open Sans', system-ui, sans-serif" }}>
+         <span className="text-xs text-muted-foreground font-medium">Pluie (mm) :</span>
+         <div
+           className="h-4 w-56 rounded border border-border"
+           style={{
+             background: `linear-gradient(to right, ${PLUIE_STOPS.map((s, i) => `${s.c} ${((i / (PLUIE_STOPS.length - 1)) * 100).toFixed(1)}%`).join(", ")})`,
+           }}
+         />
+         <span className="text-[10px] text-muted-foreground">blanc → bleu → violet (0 … 30+)</span>
        </div>
 
-      {/* ── Body ── */}
+       {/* ── Body ── */}
       <div className="flex flex-col lg:flex-row flex-1 min-h-0">
 
         {/* Sidebar */}
@@ -1011,42 +1080,52 @@ export default function App() {
                 <p className="text-[10px] font-semibold text-foreground/70 uppercase tracking-wider mb-2">
                   Pluie
                 </p>
-                <div
-                  className="rounded-lg border p-3 cursor-default select-none"
-                  style={{ backgroundColor: "#f8fafc", borderColor: "#e2e8f0" }}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#64748b" }} />
-                    <span className="text-xs font-semibold text-foreground/70">Aujourd'hui</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span
-                      className="text-2xl font-bold leading-none tabular-nums"
-                      style={{ color: "#374151", fontFamily: "var(--font-numbers)" }}
+                {(() => {
+                  const ps = pluieScale(currentPluie.today);
+                  return (
+                    <div
+                      className="rounded-lg border p-3 cursor-default select-none"
+                      style={{ backgroundColor: ps.bg, borderColor: "#e2e8f0" }}
                     >
-                      {currentPluie.today !== undefined ? currentPluie.today.toFixed(1) : "N/A"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">mm</span>
-                  </div>
-                </div>
-                <div
-                  className="rounded-lg border p-3 mt-2 cursor-default select-none"
-                  style={{ backgroundColor: "#f8fafc", borderColor: "#e2e8f0" }}
-                >
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#94a3b8" }} />
-                    <span className="text-xs font-semibold text-foreground/70">Demain</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span
-                      className="text-2xl font-bold leading-none tabular-nums"
-                      style={{ color: "#374151", fontFamily: "var(--font-numbers)" }}
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ps.text }} />
+                        <span className="text-xs font-semibold text-foreground/70">Aujourd'hui</span>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span
+                          className="text-2xl font-bold leading-none tabular-nums"
+                          style={{ color: ps.text, fontFamily: "var(--font-numbers)" }}
+                        >
+                          {currentPluie.today !== undefined ? currentPluie.today.toFixed(1) : "N/A"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">mm</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+                {(() => {
+                  const ps = pluieScale(currentPluie.tomorrow);
+                  return (
+                    <div
+                      className="rounded-lg border p-3 mt-2 cursor-default select-none"
+                      style={{ backgroundColor: ps.bg, borderColor: "#e2e8f0" }}
                     >
-                      {currentPluie.tomorrow !== undefined ? currentPluie.tomorrow.toFixed(1) : "N/A"}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">mm</span>
-                  </div>
-                </div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: ps.text }} />
+                        <span className="text-xs font-semibold text-foreground/70">Demain</span>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span
+                          className="text-2xl font-bold leading-none tabular-nums"
+                          style={{ color: ps.text, fontFamily: "var(--font-numbers)" }}
+                        >
+                          {currentPluie.tomorrow !== undefined ? currentPluie.tomorrow.toFixed(1) : "N/A"}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">mm</span>
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               {currentRisk.map(m => {
             const active = activeModels.has(m.id);
@@ -1156,26 +1235,26 @@ export default function App() {
                       </div>
                       <span className="text-[10px] text-muted-foreground font-normal">(mm)</span>
                     </td>
-                    {visibleSerials.map((serial, ci) => {
-                      const day = communeData[serial];
-                      const pluieVal = day?.pluie?.[hypothesis] as number | undefined;
-                      const globalIdx = visibleRange.start + ci;
-                      const isTodayCell = globalIdx === TODAY_INDEX;
-                      const bg = isTodayCell && pluieVal !== undefined ? "#eff6ff" : "#f1f5f9";
-                      return (
-                        <td
-                          key={serial}
-                          className="border border-border/30 p-1.5 text-center transition-colors"
-                          style={{ backgroundColor: bg }}
-                        >
-                          <div className="flex flex-col items-center gap-0.5">
-                            <span
-                              className="font-semibold text-sm leading-none"
-                              style={{ fontFamily: "var(--font-mono)", color: "#374151" }}
-                            >
-                              {pluieVal !== undefined ? pluieVal.toFixed(1) : "N/A"}
-                            </span>
-                          </div>
+                      {visibleSerials.map((serial, ci) => {
+                        const day = communeData[serial];
+                        const pluieVal = day?.pluie?.[hypothesis] as number | undefined;
+                        const globalIdx = visibleRange.start + ci;
+                        const isTodayCell = globalIdx === TODAY_INDEX;
+                        const { bg, text } = pluieScale(pluieVal);
+                        return (
+                          <td
+                            key={serial}
+                            className={`border border-border/30 p-1.5 text-center transition-colors ${isTodayCell ? "border-b-2 border-b-primary" : ""}`}
+                            style={{ backgroundColor: bg }}
+                          >
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span
+                                className="font-semibold text-sm leading-none"
+                                style={{ fontFamily: "var(--font-mono)", color: text }}
+                              >
+                                {pluieVal !== undefined ? pluieVal.toFixed(1) : "N/A"}
+                              </span>
+                            </div>
                         </td>
                       );
                     })}
