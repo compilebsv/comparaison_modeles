@@ -14,7 +14,7 @@
 * **Composants réutilisables** : Mettre les composants génériques dans \src/app/components/ui/\
 * **Composants métier** : Mettre les composants spécifiques au projet dans \src/app/components/\
 * **Séparation des concerns** : Logique métier séparée de l'UI
-* **Fichiers petits** : Chaque fichier max 300 lignes, découper sinon
+
 
 ## 2. TypeScript
 
