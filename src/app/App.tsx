@@ -463,7 +463,7 @@ function ConsensusChart({
 
 // ─── Stacked Bar Chart ─────────────────────────────────────────────────────
 
-const STACK_BAR_COLOR = "#2d6a4f";
+const STACK_BAR_COLOR = "#64748b";
 const STACK_BAR_OPACITY = 0.27;
 
 function StackedBarChart({
