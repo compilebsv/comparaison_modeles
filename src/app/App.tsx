@@ -255,22 +255,22 @@ function ConsensusChart({
            }}
            onMouseLeave={() => setMousePos(null)}
          >
-          <g transform={`translate(${L}, ${T})`}>
-            {[0, 1, 2, 3].map(v => (
-              <rect
-                key={v}
-                x={0}
-                y={yOf(v + 1)}
-                width={n * GROUP_W}
-                height={yOf(v) - yOf(v + 1)}
-                fill={RISK[v + 1].bg}
-                fillOpacity={0.35}
-              />
-            ))}
+           <g transform={`translate(${L}, ${T})`}>
+              {[0, 1, 2, 3].map(v => (
+                <rect
+                  key={v}
+                  x={0}
+                  y={yOf(v + 1)}
+                  width={n * GROUP_W}
+                  height={yOf(v) - yOf(v + 1)}
+                  fill={RISK[v + 1].bg}
+                  fillOpacity={0.35}
+                />
+              ))}
 
-            {[0, 1, 2, 3, 4].map(v => (
-              <g key={v}>
+              {[0, 1, 2, 3, 4].map(v => (
                 <line
+                  key={v}
                   x1={0} y1={yOf(v)}
                   x2={n * GROUP_W} y2={yOf(v)}
                   stroke={RISK[v].border}
@@ -278,19 +278,7 @@ function ConsensusChart({
                   strokeDasharray={v === 0 ? undefined : "3 5"}
                   strokeOpacity={0.8}
                 />
-                <text
-                  x={-6} y={yOf(v)}
-                  dominantBaseline="middle"
-                  textAnchor="end"
-                  fontSize={9.5}
-                  fill={RISK[v].text}
-                  fontFamily="'Open Sans', system-ui, sans-serif"
-                  fontWeight="500"
-                >
-                  {v} {RISK[v].label}
-                </text>
-              </g>
-            ))}
+              ))}
 
             {data.map((d, i) => {
               const x = i * GROUP_W + BAR_OFF;
@@ -493,7 +481,7 @@ function StackedBarChart({
   const GROUP_W = 52;
   const BAR_W = GROUP_W * 0.72;
   const BAR_OFF = GROUP_W * 0.14;
-  const SVG_W = L + R + n * GROUP_W;
+  const SVG_W = R + n * GROUP_W;
   const SVG_H = PLOT_H + T + B;
 
   const yOf = (v: number) => PLOT_H - (v / 4) * PLOT_H;
@@ -514,14 +502,38 @@ function StackedBarChart({
       el.scrollLeft = 0;
       return;
     }
-    const todayPos = L + todayIdx * GROUP_W;
+    const todayPos = todayIdx * GROUP_W;
     el.scrollLeft = Math.max(0, Math.min(todayPos, el.scrollWidth - el.clientWidth));
   }, [data, L, GROUP_W]);
 
   return (
     <div className="flex flex-col gap-3">
-      <div ref={scrollRef} className="overflow-x-auto w-full">
-        <svg
+      <div className="flex items-stretch">
+        <div
+          className="shrink-0 select-none relative"
+          style={{ width: L, height: SVG_H }}
+        >
+          {[0, 1, 2, 3, 4].map(v => (
+            <div
+              key={v}
+              className="absolute right-2 text-right"
+              style={{
+                top: T + yOf(v),
+                transform: "translateY(-50%)",
+                fontSize: 9.5,
+                lineHeight: 1,
+                color: RISK[v].text,
+                fontFamily: "'Open Sans', system-ui, sans-serif",
+                fontWeight: 500,
+              }}
+            >
+              {v} {RISK[v].label}
+            </div>
+          ))}
+        </div>
+
+        <div ref={scrollRef} className="overflow-x-auto flex-1 min-w-0">
+          <svg
           width={SVG_W}
           height={SVG_H}
           style={{ display: "block" }}
@@ -531,7 +543,7 @@ function StackedBarChart({
           }}
           onMouseLeave={() => setMousePos(null)}
         >
-           <g transform={`translate(${L}, ${T})`}>
+           <g transform={`translate(0, ${T})`}>
              {[0, 1, 2, 3].map(v => (
                <rect
                  key={v}
@@ -658,13 +670,13 @@ const boxW = 130;
                const el = scrollRef.current;
                const visibleLeft = el?.scrollLeft ?? 0;
                const visibleRight = el ? el.scrollLeft + el.clientWidth : SVG_W;
-const mx = mousePos.x - L;
-                const my = mousePos.y - T;
-                let boxLeft = mx + 10;
-                if (boxLeft + boxW > visibleRight - L - offset) {
-                  boxLeft = mx - offset - boxW;
-                }
-                boxLeft = Math.max(visibleLeft - L + offset, Math.min(boxLeft, visibleRight - L - boxW - offset));
+ const mx = mousePos.x;
+                 const my = mousePos.y - T;
+                 let boxLeft = mx + 10;
+                 if (boxLeft + boxW > visibleRight - offset) {
+                   boxLeft = mx - offset - boxW;
+                 }
+                 boxLeft = Math.max(visibleLeft + offset, Math.min(boxLeft, visibleRight - boxW - offset));
                 const tipX = boxLeft - offset;
                 const tipY = Math.max(0, Math.min(my - boxH - 4, PLOT_H - boxH));
               return (
@@ -701,7 +713,8 @@ const mx = mousePos.x - L;
               );
             })()}
           </g>
-        </svg>
+         </svg>
+        </div>
       </div>
 
       <div className="flex flex-col gap-1 text-xs text-muted-foreground">
