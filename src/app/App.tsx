@@ -1250,7 +1250,7 @@ export default function App() {
                         return (
                           <td
                             key={serial}
-                            className={`border border-border/30 p-1.5 text-center transition-colors ${isTodayCell ? "border-b-2 border-b-primary" : ""}`}
+                            className={`border border-border/30 p-1.5 text-center transition-colors ${isTodayCell ? "border-t-2 border-t-primary" : ""}`}
                             style={{ backgroundColor: bg }}
                           >
                             <div className="flex flex-col items-center gap-0.5">
