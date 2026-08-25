@@ -123,6 +123,14 @@ const LOCATIONS = COMMUNES.map(name => {
   };
 });
 
+// ─── Region display labels ───────────────────────────────────────────────────
+// Underlying region codes stay the same ("16", "33"); only the labels change.
+const REGION_LABELS: Record<string, string> = {
+  "16": "Charentes",
+  "33": "Nouvelle-Aquitaine",
+};
+const regionLabel = (r: string): string => REGION_LABELS[r] ?? r;
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function RiskCell({ level, showLabel = false, isToday = false }: { level?: number; showLabel?: boolean; isToday?: boolean }) {
@@ -944,7 +952,7 @@ export default function App() {
                   className={`w-full text-left px-4 py-2.5 text-sm flex items-center justify-between gap-4 hover:bg-secondary transition-colors ${loc.name === location.name ? "text-primary font-semibold" : ""}`}
                 >
                   <span>{loc.name}</span>
-                  <span className="text-xs text-muted-foreground">{loc.region}</span>
+                  <span className="text-xs text-muted-foreground">{regionLabel(loc.region)}</span>
                 </button>
               ))}
             </div>
@@ -958,7 +966,7 @@ export default function App() {
               onClick={() => setRegionOpen(v => !v)}
               className="flex items-center gap-2 border border-border rounded-md px-3 py-1.5 text-sm bg-background hover:border-primary/50 transition-colors"
             >
-              <span className="font-medium">{regionFilter ?? 'Région'}</span>
+              <span className="font-medium">{regionFilter ? regionLabel(regionFilter) : 'Région'}</span>
               <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
             {regionOpen && (
@@ -969,7 +977,7 @@ export default function App() {
                     onClick={() => { setRegionFilter(r); setRegionOpen(false); }}
                     className={"w-full text-left px-4 py-2 text-sm hover:bg-secondary transition-colors " + (regionFilter === r ? 'text-primary font-semibold' : '')}
                   >
-                    <span>{r}</span>
+                    <span>{regionLabel(r)}</span>
                   </button>
                 ))}
               </div>
