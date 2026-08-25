@@ -20,19 +20,19 @@ const RISK = [
 
 const PLUIE_STOPS: { v: number; c: string }[] = [
   { v: 0,    c: "#ffffff" },
-  { v: 0.25, c: "#eff6ff" },
-  { v: 0.5,  c: "#dbeafe" },
-  { v: 1,    c: "#bfdbfe" },
-  { v: 1.5,  c: "#93c5fd" },
-  { v: 2,    c: "#60a5fa" },
-  { v: 3,    c: "#3b82f6" },
-  { v: 5,    c: "#2563eb" },
-  { v: 7,    c: "#1d4ed8" },
-  { v: 10,   c: "#4338ca" },
-  { v: 15,   c: "#5b21b6" },
-  { v: 20,   c: "#6d28d9" },
-  { v: 25,   c: "#7c3aed" },
-  { v: 30,   c: "#8b5cf6" },
+  { v: 0.25, c: "#f4f8fd" },
+  { v: 0.5,  c: "#eaf2fb" },
+  { v: 1,    c: "#ddeaf9" },
+  { v: 1.5,  c: "#cfe1f6" },
+  { v: 2,    c: "#c0d7f2" },
+  { v: 3,    c: "#aec9ec" },
+  { v: 5,    c: "#9bbbe6" },
+  { v: 7,    c: "#87abdf" },
+  { v: 10,   c: "#749bd6" },
+  { v: 15,   c: "#6f8fcf" },
+  { v: 20,   c: "#7d88c6" },
+  { v: 25,   c: "#9083c0" },
+  { v: 30,   c: "#9f7dbd" },
 ];
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -68,7 +68,7 @@ function pluieScale(v: number | undefined): { bg: string; text: string } {
   }
   const [r, g, b] = rgb;
   const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return { bg: `rgb(${r}, ${g}, ${b})`, text: lum > 0.62 ? "#1f2937" : "#ffffff" };
+  return { bg: `rgb(${r}, ${g}, ${b})`, text: lum > 0.55 ? "#1f2937" : "#ffffff" };
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
@@ -1053,13 +1053,19 @@ export default function App() {
        {/* ── Rain legend ── */}
        <div className="px-6 py-2.5 border-b border-border bg-background flex items-center gap-3 flex-wrap" style={{ fontFamily: "'Open Sans', system-ui, sans-serif" }}>
          <span className="text-xs text-muted-foreground font-medium">Pluie (mm) :</span>
-         <div
-           className="h-4 w-56 rounded border border-border"
-           style={{
-             background: `linear-gradient(to right, ${PLUIE_STOPS.map((s, i) => `${s.c} ${((i / (PLUIE_STOPS.length - 1)) * 100).toFixed(1)}%`).join(", ")})`,
-           }}
-         />
-         <span className="text-[10px] text-muted-foreground">blanc → bleu → violet (0 … 30+)</span>
+         <div className="flex items-end">
+           {PLUIE_STOPS.map((s, i) => (
+             <div key={i} className="flex flex-col items-center">
+               <div
+                 className="h-4 w-8"
+                 style={{ backgroundColor: s.c, borderLeft: i === 0 ? "1px solid rgb(226 232 240 / 0.6)" : undefined, borderRight: i === PLUIE_STOPS.length - 1 ? "1px solid rgb(226 232 240 / 0.6)" : "1px solid rgba(255,255,255,0.7)" }}
+               />
+               <span className="text-[9px] text-muted-foreground mt-0.5 leading-none" style={{ fontFamily: "var(--font-mono)" }}>
+                 {s.v === 30 ? "30+" : s.v}
+               </span>
+             </div>
+           ))}
+         </div>
        </div>
 
        {/* ── Body ── */}
