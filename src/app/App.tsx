@@ -725,7 +725,7 @@ const boxW = 130;
         </div>
       </div>
 
-      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
         <span className="font-medium text-foreground/70">Risque empilé :</span>
         {legendItems.map(({ count, eff, opacity }) => (
           <span key={count} className="flex items-center gap-1.5">
