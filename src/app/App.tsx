@@ -20,19 +20,19 @@ const RISK = [
 
 const PLUIE_STOPS: { v: number; c: string }[] = [
   { v: 0,    c: "#ffffff" },
-  { v: 0.25, c: "#f4f8fd" },
-  { v: 0.5,  c: "#eaf2fb" },
-  { v: 1,    c: "#ddeaf9" },
-  { v: 1.5,  c: "#cfe1f6" },
-  { v: 2,    c: "#c0d7f2" },
-  { v: 3,    c: "#aec9ec" },
-  { v: 5,    c: "#9bbbe6" },
-  { v: 7,    c: "#87abdf" },
-  { v: 10,   c: "#749bd6" },
-  { v: 15,   c: "#6f8fcf" },
-  { v: 20,   c: "#7d88c6" },
-  { v: 25,   c: "#9083c0" },
-  { v: 30,   c: "#9f7dbd" },
+  { v: 0.25, c: "#e3ecfa" },
+  { v: 0.5,  c: "#cde0f4" },
+  { v: 1,    c: "#b8cdef" },
+  { v: 1.5,  c: "#a3bfeb" },
+  { v: 2,    c: "#8db1e7" },
+  { v: 3,    c: "#789fdf" },
+  { v: 5,    c: "#6390d6" },
+  { v: 7,    c: "#527fcb" },
+  { v: 10,   c: "#4471bf" },
+  { v: 15,   c: "#4a63b4" },
+  { v: 20,   c: "#585eae" },
+  { v: 25,   c: "#6b5aa8" },
+  { v: 30,   c: "#7d57a3" },
 ];
 
 function hexToRgb(hex: string): [number, number, number] {
