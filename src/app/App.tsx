@@ -20,24 +20,40 @@ const RISK = [
 
 const PLUIE_STOPS: { v: number; c: string }[] = [
   { v: 0,    c: "#ffffff" },
-  { v: 0.25, c: "#e3ecfa" },
-  { v: 0.5,  c: "#cde0f4" },
-  { v: 1,    c: "#b8cdef" },
-  { v: 1.5,  c: "#a3bfeb" },
-  { v: 2,    c: "#8db1e7" },
-  { v: 3,    c: "#789fdf" },
-  { v: 5,    c: "#6390d6" },
-  { v: 7,    c: "#527fcb" },
-  { v: 10,   c: "#4471bf" },
-  { v: 15,   c: "#4a63b4" },
-  { v: 20,   c: "#585eae" },
-  { v: 25,   c: "#6b5aa8" },
-  { v: 30,   c: "#7d57a3" },
+  { v: 0.25, c: "#f4f8fd" },
+  { v: 0.5,  c: "#eaf2fb" },
+  { v: 1,    c: "#ddeaf9" },
+  { v: 1.5,  c: "#cfe1f6" },
+  { v: 2,    c: "#c0d7f2" },
+  { v: 3,    c: "#aec9ec" },
+  { v: 5,    c: "#9bbbe6" },
+  { v: 7,    c: "#87abdf" },
+  { v: 10,   c: "#749bd6" },
+  { v: 15,   c: "#6f8fcf" },
+  { v: 20,   c: "#7d88c6" },
+  { v: 25,   c: "#9083c0" },
+  { v: 30,   c: "#9f7dbd" },
 ];
 
 function hexToRgb(hex: string): [number, number, number] {
   const n = parseInt(hex.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+// Adaptive text color: interpolates between white (dark background) and a dark
+// slate (light background) based on the background luminance. Once the
+// background is dark enough (below lumLow), the text stays white.
+function readableText(lum: number): string {
+  const DARK: [number, number, number] = [31, 41, 55];   // #1f2937
+  const WHITE: [number, number, number] = [255, 255, 255];
+  const lumLow = 0.35;
+  const lumHigh = 0.6;
+  const t = Math.max(0, Math.min(1, (lum - lumLow) / (lumHigh - lumLow)));
+  // t = 0 → white (dark bg), t = 1 → dark (light bg)
+  const r = Math.round(WHITE[0] + (DARK[0] - WHITE[0]) * t);
+  const g = Math.round(WHITE[1] + (DARK[1] - WHITE[1]) * t);
+  const b = Math.round(WHITE[2] + (DARK[2] - WHITE[2]) * t);
+  return `rgb(${r}, ${g}, ${b})`;
 }
 
 function pluieScale(v: number | undefined): { bg: string; text: string } {
@@ -67,8 +83,8 @@ function pluieScale(v: number | undefined): { bg: string; text: string } {
     ];
   }
   const [r, g, b] = rgb;
-  const text = v >= 1 ? "#ffffff" : "#1f2937";
-  return { bg: `rgb(${r}, ${g}, ${b})`, text };
+  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return { bg: `rgb(${r}, ${g}, ${b})`, text: readableText(lum) };
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
