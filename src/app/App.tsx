@@ -67,8 +67,8 @@ function pluieScale(v: number | undefined): { bg: string; text: string } {
     ];
   }
   const [r, g, b] = rgb;
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return { bg: `rgb(${r}, ${g}, ${b})`, text: lum > 0.55 ? "#1f2937" : "#ffffff" };
+  const text = v >= 1 ? "#ffffff" : "#1f2937";
+  return { bg: `rgb(${r}, ${g}, ${b})`, text };
 }
 
 // ─── Models ───────────────────────────────────────────────────────────────────
